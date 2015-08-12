@@ -528,7 +528,6 @@ void pl_switch_dispmode(void)
 	}
 }
 
-#ifndef MAEMO
 /* adjust circle-like analog inputs to better match
  * more square-like analogs in PSX */
 static void update_analog_nub_adjust(int *x_, int *y_)
@@ -613,9 +612,6 @@ static void update_input(void)
 
 	in_keystate = actions[IN_BINDTYPE_PLAYER12];
 }
-#else /* MAEMO */
-extern void update_input(void);
-#endif
 
 void pl_update_gun(int *xn, int *yn, int *xres, int *yres, int *in)
 {
