@@ -140,28 +140,6 @@ void emu_set_default_config(void)
 	in_type2 = PSE_PAD_TYPE_STANDARD;
 }
 
-void do_emu_action(void)
-{
-	int ret;
-
-	emu_action_old = emu_action;
-
-	switch (emu_action) {
-	case SACTION_LOAD_STATE:
-		ret = emu_load_state(state_slot);
-		snprintf(hud_msg, sizeof(hud_msg), ret == 0 ? "LOADED" : "FAIL!");
-		break;
-	case SACTION_SAVE_STATE:
-		ret = emu_save_state(state_slot);
-		snprintf(hud_msg, sizeof(hud_msg), ret == 0 ? "SAVED" : "FAIL!");
-		break;
-	default:
-		return;
-	}
-
-	hud_new_msg = 3;
-}
-
 static char basic_lcase(char c)
 {
 	if ('A' <= c && c <= 'Z')
@@ -383,50 +361,6 @@ void SysUpdate() {
 int get_state_filename(char *buf, int size, int i) {
 	return get_gameid_filename(buf, size,
 		"." STATES_DIR "%.32s-%.9s.%3.3d", i);
-}
-
-int emu_check_state(int slot)
-{
-	char fname[MAXPATHLEN];
-	int ret;
-
-	ret = get_state_filename(fname, sizeof(fname), slot);
-	if (ret != 0)
-		return ret;
-
-	return CheckState(fname);
-}
-
-int emu_save_state(int slot)
-{
-	char fname[MAXPATHLEN];
-	int ret;
-
-	ret = get_state_filename(fname, sizeof(fname), slot);
-	if (ret != 0)
-		return ret;
-
-	ret = SaveState(fname);
-#if defined(__arm__) && !defined(__ARM_ARCH_7A__) /* XXX GPH hack */
-	sync();
-#endif
-	SysPrintf("* %s \"%s\" [%d]\n",
-		ret == 0 ? "saved" : "failed to save", fname, slot);
-	return ret;
-}
-
-int emu_load_state(int slot)
-{
-	char fname[MAXPATHLEN];
-	int ret;
-
-	hud_msg[0] = 0;
-
-	ret = get_state_filename(fname, sizeof(fname), slot);
-	if (ret != 0)
-		return ret;
-
-	return LoadState(fname);
 }
 
 #ifndef ANDROID

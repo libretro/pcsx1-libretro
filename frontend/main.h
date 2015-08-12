@@ -47,9 +47,6 @@ void emu_set_default_config(void);
 void emu_on_new_cd(int show_hud_msg);
 
 int get_state_filename(char *buf, int size, int i);
-int emu_check_state(int slot);
-int emu_save_state(int slot);
-int emu_load_state(int slot);
 
 void set_cd_image(const char *fname);
 
