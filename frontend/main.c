@@ -32,9 +32,11 @@
 #define BOOT_MSG "Booting up..."
 #endif
 
+#ifdef DEBUG
 // don't include debug.h - it breaks ARM build (R1 redefined)
 void StartDebugger();
 void StopDebugger();
+#endif
 
 int ready_to_go, g_emu_want_quit, g_emu_resetting;
 unsigned long gpuDisp;
@@ -319,9 +321,10 @@ int emu_core_init(void)
 
 	LoadMcds(Config.Mcd1, Config.Mcd2);
 
-	if (Config.Debug) {
+#ifdef DEBUG
+	if (Config.Debug)
 		StartDebugger();
-	}
+#endif
 
 	return 0;
 }
@@ -364,7 +367,9 @@ void SysClose() {
 	EmuShutdown();
 	ReleasePlugins();
 
+#ifdef DEBUG
 	StopDebugger();
+#endif
 
 	if (emuLog != NULL && emuLog != stdout && emuLog != stderr) {
 		fclose(emuLog);

@@ -24,7 +24,7 @@ CFLAGS += -DPCNT
 endif
 
 # core
-OBJS += libpcsxcore/cdriso.o libpcsxcore/cdrom.o libpcsxcore/cheat.o libpcsxcore/debug.o \
+OBJS += libpcsxcore/cdriso.o libpcsxcore/cdrom.o libpcsxcore/cheat.o \
 	libpcsxcore/decode_xa.o libpcsxcore/mdec.o \
 	libpcsxcore/misc.o libpcsxcore/plugins.o libpcsxcore/ppf.o libpcsxcore/psxbios.o \
 	libpcsxcore/psxcommon.o libpcsxcore/psxcounters.o libpcsxcore/psxdma.o libpcsxcore/psxhle.o \
@@ -32,7 +32,8 @@ OBJS += libpcsxcore/cdriso.o libpcsxcore/cdrom.o libpcsxcore/cheat.o libpcsxcore
 	libpcsxcore/sio.o libpcsxcore/socket.o libpcsxcore/spu.o
 
 ifeq "$(DEBUG)" "1"
-OBJS += libpcsxcore/disr3000a.o
+OBJS += libpcsxcore/disr3000a.o \
+		  libpcsxcore/debug.o 
 endif
 
 OBJS += libpcsxcore/gte.o libpcsxcore/gte_nf.o libpcsxcore/gte_divider.o
