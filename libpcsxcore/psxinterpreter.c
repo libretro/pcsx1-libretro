@@ -370,7 +370,9 @@ static int psxDelayBranchTest(u32 tar1) {
 	if (tar2 == (u32)-1)
 		return 0;
 
+#ifdef DEBUG
 	debugI();
+#endif
 
 	/*
 	 * Branch in delay slot:
@@ -380,10 +382,11 @@ static int psxDelayBranchTest(u32 tar1) {
 	 */
 	psxRegs.pc = tar1;
 	tmp1 = psxBranchNoDelay();
-	if (tmp1 == (u32)-1) {
+	if (tmp1 == (u32)-1)
 		return psxDelayBranchExec(tar2);
-	}
+#ifdef DEBUG
 	debugI();
+#endif
 	psxRegs.cycle += BIAS;
 
 	/*
@@ -393,10 +396,11 @@ static int psxDelayBranchTest(u32 tar1) {
 	 */
 	psxRegs.pc = tar2;
 	tmp2 = psxBranchNoDelay();
-	if (tmp2 == (u32)-1) {
+	if (tmp2 == (u32)-1)
 		return psxDelayBranchExec(tmp1);
-	}
+#ifdef DEBUG
 	debugI();
+#endif
 	psxRegs.cycle += BIAS;
 
 	/*
@@ -422,7 +426,9 @@ static void doBranch(u32 tar) {
 	code = (u32 *)PSXM(psxRegs.pc);
 	psxRegs.code = ((code == NULL) ? 0 : SWAP32(*code));
 
+#ifdef DEBUG
 	debugI();
+#endif
 
 	psxRegs.pc += 4;
 	psxRegs.cycle += BIAS;
@@ -928,13 +934,14 @@ static void intShutdown() {
 }
 
 // interpreter execution
-void execI() {
+void execI()
+{
 	u32 *code = (u32 *)PSXM(psxRegs.pc);
 	psxRegs.code = ((code == NULL) ? 0 : SWAP32(*code));
-
+#ifdef DEBUG
 	debugI();
-
 	if (Config.Debug) ProcessDebug();
+#endif
 
 	psxRegs.pc += 4;
 	psxRegs.cycle += BIAS;
