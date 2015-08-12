@@ -40,7 +40,7 @@
 #define SWAP16(x) ({ uint16_t y=(x); (((y)>>8 & 0xff) | ((y)<<8 & 0xff00)); })
 #define SWAP32(x) ({ uint32_t y=(x); (((y)>>24 & 0xfful) | ((y)>>8 & 0xff00ul) | ((y)<<8 & 0xff0000ul) | ((y)<<24 & 0xff000000ul)); })
 
-#ifdef __BIG_ENDIAN__
+#ifdef MSB_FIRST
 
 // big endian config
 #define HOST2LE32(x) SWAP32(x)
@@ -219,22 +219,16 @@ extern int32_t           drawH;
 #define KEY_BADTEXTURES   128
 #define KEY_CHECKTHISOUT  256
 
-#if !defined(__BIG_ENDIAN__) || defined(__x86_64__) || defined(__i386__)
-#ifndef __LITTLE_ENDIAN__
-#define __LITTLE_ENDIAN__
-#endif
-#endif
-
-#ifdef __LITTLE_ENDIAN__
-#define RED(x) (x & 0xff)
-#define BLUE(x) ((x>>16) & 0xff)
-#define GREEN(x) ((x>>8) & 0xff)
-#define COLOR(x) (x & 0xffffff)
-#elif defined __BIG_ENDIAN__
+#ifdef MSB_FIRST
 #define RED(x) ((x>>24) & 0xff)
 #define BLUE(x) ((x>>8) & 0xff)
 #define GREEN(x) ((x>>16) & 0xff)
 #define COLOR(x) SWAP32(x & 0xffffff)
+#else
+#define RED(x) (x & 0xff)
+#define BLUE(x) ((x>>16) & 0xff)
+#define GREEN(x) ((x>>8) & 0xff)
+#define COLOR(x) (x & 0xffffff)
 #endif
 
 PSXDisplay_t      PSXDisplay;
