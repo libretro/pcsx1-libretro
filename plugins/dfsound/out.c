@@ -18,23 +18,7 @@ void SetupSound(void)
 	int i;
 
 	if (driver_count == 0) {
-#ifdef HAVE_OSS
-		REGISTER_DRIVER(oss);
-#endif
-#ifdef HAVE_ALSA
-		REGISTER_DRIVER(alsa);
-#endif
-#ifdef HAVE_SDL
-		REGISTER_DRIVER(sdl);
-#endif
-#ifdef HAVE_PULSE
-		REGISTER_DRIVER(pulse);
-#endif
-#ifdef HAVE_LIBRETRO
 		REGISTER_DRIVER(libretro);
-#else
-		REGISTER_DRIVER(none);
-#endif
 	}
 
 	for (i = 0; i < driver_count; i++)
