@@ -62,7 +62,7 @@ endif
 # spu
 OBJS += plugins/dfsound/dma.o plugins/dfsound/freeze.o \
 	plugins/dfsound/registers.o plugins/dfsound/spu.o \
-	plugins/dfsound/out.o plugins/dfsound/nullsnd.o
+	plugins/dfsound/out.o
 plugins/dfsound/spu.o: plugins/dfsound/adsr.c plugins/dfsound/reverb.c \
 	plugins/dfsound/xa.c
 ifeq "$(ARCH)" "arm"
