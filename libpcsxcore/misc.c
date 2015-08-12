@@ -59,7 +59,7 @@ void mmssdd( char *b, char *p )
 #if defined(__arm__)
 	unsigned char *u = (void *)b;
 	int block = (u[3] << 24) | (u[2] << 16) | (u[1] << 8) | u[0];
-#elif defined(__BIGENDIAN__)
+#elif defined(MSB_FIRST)
 	int block = (b[0] & 0xff) | ((b[1] & 0xff) << 8) | ((b[2] & 0xff) << 16) | (b[3] << 24);
 #else
 	int block = *((int*)b);
