@@ -913,16 +913,14 @@ void *retro_get_memory_data(unsigned id)
 {
 	if (id == RETRO_MEMORY_SAVE_RAM)
 		return Mcd1Data;
-	else
-		return NULL;
+   return NULL;
 }
 
 size_t retro_get_memory_size(unsigned id)
 {
 	if (id == RETRO_MEMORY_SAVE_RAM)
 		return MCD_SIZE;
-	else
-		return 0;
+   return 0;
 }
 
 void retro_reset(void)

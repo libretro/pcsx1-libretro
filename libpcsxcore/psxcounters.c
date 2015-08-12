@@ -134,17 +134,15 @@ void _psxRcntWcount( u32 index, u32 value )
 static inline
 u32 _psxRcntRcount( u32 index )
 {
-    u32 count;
-
-    count  = psxRegs.cycle;
+    u32 count  = psxRegs.cycle;
     count -= rcnts[index].cycleStart;
     if (rcnts[index].rate > 1)
         count /= rcnts[index].rate;
 
+#ifdef DEBUG
     if( count > 0x10000 )
-    {
         verboseLog( 1, "[RCNT %i] rcount > 0x10000: %x\n", index, count );
-    }
+#endif
     count &= 0xffff;
 
     return count;
@@ -157,42 +155,28 @@ void _psxRcntWmode( u32 index, u32 value )
 
     switch( index )
     {
-        case 0:
-            if( value & Rc0PixelClock )
-            {
-                rcnts[index].rate = 5;
-            }
-            else
-            {
-                rcnts[index].rate = 1;
-            }
-        break;
-        case 1:
-            if( value & Rc1HSyncClock )
-            {
-                rcnts[index].rate = (PSXCLK / (FrameRate[Config.PsxType] * HSyncTotal[Config.PsxType]));
-            }
-            else
-            {
-                rcnts[index].rate = 1;
-            }
-        break;
-        case 2:
-            if( value & Rc2OneEighthClock )
-            {
-                rcnts[index].rate = 8;
-            }
-            else
-            {
-                rcnts[index].rate = 1;
-            }
+       case 0:
+          if( value & Rc0PixelClock )
+             rcnts[index].rate = 5;
+          else
+             rcnts[index].rate = 1;
+          break;
+       case 1:
+          if( value & Rc1HSyncClock )
+             rcnts[index].rate = (PSXCLK / (FrameRate[Config.PsxType] * HSyncTotal[Config.PsxType]));
+          else
+             rcnts[index].rate = 1;
+          break;
+       case 2:
+          if( value & Rc2OneEighthClock )
+             rcnts[index].rate = 8;
+          else
+             rcnts[index].rate = 1;
 
-            // TODO: wcount must work.
-            if( value & Rc2Disable )
-            {
-                rcnts[index].rate = 0xffffffff;
-            }
-        break;
+          // TODO: wcount must work.
+          if( value & Rc2Disable )
+             rcnts[index].rate = 0xffffffff;
+          break;
     }
 }
 
@@ -218,9 +202,7 @@ void psxRcntSet()
         }
 
         if( countToUpdate < (s32)psxNextCounter )
-        {
             psxNextCounter = countToUpdate;
-        }
     }
 
     psxRegs.interrupt |= (1 << PSXINT_RCNT);
@@ -301,21 +283,15 @@ void psxRcntUpdate()
 
     // rcnt 0.
     if( cycle - rcnts[0].cycleStart >= rcnts[0].cycle )
-    {
         psxRcntReset( 0 );
-    }
 
     // rcnt 1.
     if( cycle - rcnts[1].cycleStart >= rcnts[1].cycle )
-    {
         psxRcntReset( 1 );
-    }
 
     // rcnt 2.
     if( cycle - rcnts[2].cycleStart >= rcnts[2].cycle )
-    {
         psxRcntReset( 2 );
-    }
 
     // rcnt base.
     if( cycle - rcnts[3].cycleStart >= rcnts[3].cycle )
@@ -381,7 +357,9 @@ void psxRcntUpdate()
 
 void psxRcntWcount( u32 index, u32 value )
 {
+#ifndef NDEBUG
     verboseLog( 2, "[RCNT %i] wcount: %x\n", index, value );
+#endif
 
     _psxRcntWcount( index, value );
     psxRcntSet();
@@ -389,7 +367,9 @@ void psxRcntWcount( u32 index, u32 value )
 
 void psxRcntWmode( u32 index, u32 value )
 {
+#ifndef NDEBUG
     verboseLog( 1, "[RCNT %i] wmode: %x\n", index, value );
+#endif
 
     _psxRcntWmode( index, value );
     _psxRcntWcount( index, 0 );
@@ -400,7 +380,9 @@ void psxRcntWmode( u32 index, u32 value )
 
 void psxRcntWtarget( u32 index, u32 value )
 {
+#ifndef NDEBUG
     verboseLog( 1, "[RCNT %i] wtarget: %x\n", index, value );
+#endif
 
     rcnts[index].target = value;
 
@@ -412,9 +394,7 @@ void psxRcntWtarget( u32 index, u32 value )
 
 u32 psxRcntRcount( u32 index )
 {
-    u32 count;
-
-    count = _psxRcntRcount( index );
+    u32 count = _psxRcntRcount( index );
 
     // Parasite Eve 2 fix.
     if( Config.RCntFix )
@@ -422,39 +402,41 @@ u32 psxRcntRcount( u32 index )
         if( index == 2 )
         {
             if( rcnts[index].counterState == CountToTarget )
-            {
                 count /= BIAS;
-            }
         }
     }
 
+#ifndef NDEBUG
     verboseLog( 2, "[RCNT %i] rcount: %x\n", index, count );
+#endif
 
     return count;
 }
 
 u32 psxRcntRmode( u32 index )
 {
-    u16 mode;
-
-    mode = rcnts[index].mode;
+    u16 mode = rcnts[index].mode;
     rcnts[index].mode &= 0xe7ff;
 
+#ifndef NDEBUG
     verboseLog( 2, "[RCNT %i] rmode: %x\n", index, mode );
+#endif
 
     return mode;
 }
 
 u32 psxRcntRtarget( u32 index )
 {
+#ifndef NDEBUG
     verboseLog( 2, "[RCNT %i] rtarget: %x\n", index, rcnts[index].target );
+#endif
 
     return rcnts[index].target;
 }
 
 /******************************************************************************/
 
-void psxRcntInit()
+void psxRcntInit(void)
 {
     s32 i;
 
@@ -476,9 +458,7 @@ void psxRcntInit()
     rcnts[3].target = (PSXCLK / (FrameRate[Config.PsxType] * HSyncTotal[Config.PsxType]));
 
     for( i = 0; i < CounterQuantity; ++i )
-    {
         _psxRcntWcount( i, 0 );
-    }
 
     hSyncCount = 0;
     hsync_steps = 1;
@@ -517,5 +497,3 @@ s32 psxRcntFreeze( void *f, s32 Mode )
 
     return 0;
 }
-
-/******************************************************************************/
