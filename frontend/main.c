@@ -28,15 +28,6 @@
 #include "../plugins/dfsound/spu_config.h"
 #include "revision.h"
 
-#ifndef NO_FRONTEND
-#include "libpicofe/input.h"
-#include "libpicofe/plat.h"
-#include "libpicofe/readpng.h"
-
-static void toggle_fast_forward(int force_off);
-static void check_profile(void);
-static void check_memcards(void);
-#endif
 #ifndef BOOT_MSG
 #define BOOT_MSG "Booting up..."
 #endif
@@ -101,13 +92,6 @@ void set_cd_image(const char *fname)
 
 static void set_default_paths(void)
 {
-#ifndef NO_FRONTEND
-	snprintf(Config.PatchesDir, sizeof(Config.PatchesDir), "." PATCHES_DIR);
-	MAKE_PATH(Config.Mcd1, MEMCARD_DIR, "card1.mcd");
-	MAKE_PATH(Config.Mcd2, MEMCARD_DIR, "card2.mcd");
-	strcpy(Config.BiosDir, "bios");
-#endif
-
 	strcpy(Config.PluginsDir, "plugins");
 	strcpy(Config.Gpu, "builtin_gpu");
 	strcpy(Config.Spu, "builtin_spu");
@@ -169,105 +153,6 @@ void do_emu_action(void)
 		ret = emu_save_state(state_slot);
 		snprintf(hud_msg, sizeof(hud_msg), ret == 0 ? "SAVED" : "FAIL!");
 		break;
-#ifndef NO_FRONTEND
-	case SACTION_ENTER_MENU:
-		toggle_fast_forward(1);
-		menu_loop();
-		return;
-	case SACTION_NEXT_SSLOT:
-		state_slot++;
-		if (state_slot > 9)
-			state_slot = 0;
-		goto do_state_slot;
-	case SACTION_PREV_SSLOT:
-		state_slot--;
-		if (state_slot < 0)
-			state_slot = 9;
-do_state_slot:
-		snprintf(hud_msg, sizeof(hud_msg), "STATE SLOT %d [%s]", state_slot,
-			emu_check_state(state_slot) == 0 ? "USED" : "FREE");
-		hud_new_msg = 3;
-		SysPrintf("* %s\n", hud_msg);
-		break;
-	case SACTION_TOGGLE_FSKIP:
-		pl_rearmed_cbs.fskip_advice = 0;
-		pl_rearmed_cbs.frameskip++;
-		if (pl_rearmed_cbs.frameskip > 1)
-			pl_rearmed_cbs.frameskip = -1;
-		snprintf(hud_msg, sizeof(hud_msg), "FRAMESKIP: %s",
-			pl_rearmed_cbs.frameskip == -1 ? "AUTO" :
-			pl_rearmed_cbs.frameskip == 0 ? "OFF" : "1" );
-		plugin_call_rearmed_cbs();
-		break;
-	case SACTION_SWITCH_DISPMODE:
-		pl_switch_dispmode();
-		plugin_call_rearmed_cbs();
-		if (GPU_open != NULL && GPU_close != NULL) {
-			GPU_close();
-			GPU_open(&gpuDisp, "PCSX", NULL);
-		}
-		break;
-	case SACTION_FAST_FORWARD:
-		toggle_fast_forward(0);
-		plugin_call_rearmed_cbs();
-		break;
-	case SACTION_TOGGLE_FPS:
-		if ((g_opts & (OPT_SHOWFPS|OPT_SHOWCPU))
-		    == (OPT_SHOWFPS|OPT_SHOWCPU))
-			g_opts &= ~(OPT_SHOWFPS|OPT_SHOWCPU);
-		else if (g_opts & OPT_SHOWFPS)
-			g_opts |= OPT_SHOWCPU;
-		else
-			g_opts |= OPT_SHOWFPS;
-		break;
-	case SACTION_TOGGLE_FULLSCREEN:
-		plat_target.vout_fullscreen = !plat_target.vout_fullscreen;
-		if (GPU_open != NULL && GPU_close != NULL) {
-			GPU_close();
-			GPU_open(&gpuDisp, "PCSX", NULL);
-		}
-		break;
-	case SACTION_SCREENSHOT:
-		{
-			char buf[MAXPATHLEN];
-			void *scrbuf;
-			int w, h, bpp;
-			time_t t = time(NULL);
-			struct tm *tb = localtime(&t);
-			int ti = tb->tm_yday * 1000000 + tb->tm_hour * 10000 +
-				tb->tm_min * 100 + tb->tm_sec;
-
-			scrbuf = pl_prepare_screenshot(&w, &h, &bpp);
-			get_gameid_filename(buf, sizeof(buf),
-				"screenshots/%.32s-%.9s.%d.png", ti);
-			ret = -1;
-			if (scrbuf != 0 && bpp == 16)
-				ret = writepng(buf, scrbuf, w, h);
-			if (ret == 0)
-				snprintf(hud_msg, sizeof(hud_msg), "SCREENSHOT TAKEN");
-			break;
-		}
-	case SACTION_VOLUME_UP:
-	case SACTION_VOLUME_DOWN:
-		{
-			static int volume;
-			plat_target_step_volume(&volume,
-				emu_action == SACTION_VOLUME_UP ? 1 : -1);
-		}
-		return;
-	case SACTION_MINIMIZE:
-		if (GPU_close != NULL)
-			GPU_close();
-
-		plat_minimize();
-
-		if (GPU_open != NULL) {
-			ret = GPU_open(&gpuDisp, "PCSX", NULL);
-			if (ret)
-				SysMessage("GPU_open returned %d", ret);
-		}
-		return;
-#endif
 	default:
 		return;
 	}
@@ -427,11 +312,6 @@ int emu_core_init(void)
 {
 	SysPrintf("Starting PCSX-ReARMed " REV "\n");
 
-#ifndef NO_FRONTEND
-	check_profile();
-	check_memcards();
-#endif
-
 	if (EmuInit() == -1) {
 		SysPrintf("PSX emulator couldn't be initialized.\n");
 		return -1;
@@ -451,255 +331,6 @@ void emu_core_ask_exit(void)
 	stop = 1;
 	g_emu_want_quit = 1;
 }
-
-#ifndef NO_FRONTEND
-
-#include <sys/stat.h>
-#include <sys/types.h>
-
-static void create_profile_dir(const char *directory) {
-	char path[MAXPATHLEN];
-
-	MAKE_PATH(path, directory, NULL);
-	mkdir(path, S_IRWXU | S_IRWXG);
-}
-
-static void check_profile(void) {
-	// make sure that ~/.pcsx exists
-	create_profile_dir(PCSX_DOT_DIR);
-
-	create_profile_dir(BIOS_DIR);
-	create_profile_dir(MEMCARD_DIR);
-	create_profile_dir(STATES_DIR);
-	create_profile_dir(PLUGINS_DIR);
-	create_profile_dir(PLUGINS_CFG_DIR);
-	create_profile_dir(CHEATS_DIR);
-	create_profile_dir(PATCHES_DIR);
-	create_profile_dir(PCSX_DOT_DIR "cfg");
-	create_profile_dir("/screenshots/");
-}
-
-static void check_memcards(void)
-{
-	char buf[MAXPATHLEN];
-	FILE *f;
-	int i;
-
-	for (i = 1; i <= 9; i++) {
-		snprintf(buf, sizeof(buf), ".%scard%d.mcd", MEMCARD_DIR, i);
-
-		f = fopen(buf, "rb");
-		if (f == NULL) {
-			SysPrintf("Creating memcard: %s\n", buf);
-			CreateMcd(buf);
-		}
-		else
-			fclose(f);
-	}
-}
-
-int main(int argc, char *argv[])
-{
-	char file[MAXPATHLEN] = "";
-	char path[MAXPATHLEN];
-	const char *cdfile = NULL;
-	const char *loadst_f = NULL;
-	int psxout = 0;
-	int loadst = 0;
-	int i;
-
-	emu_core_preinit();
-
-	// read command line options
-	for (i = 1; i < argc; i++) {
-		     if (!strcmp(argv[i], "-psxout")) psxout = 1;
-		else if (!strcmp(argv[i], "-load")) loadst = atol(argv[++i]);
-		else if (!strcmp(argv[i], "-cfg")) {
-			if (i+1 >= argc) break;
-			strncpy(cfgfile_basename, argv[++i], MAXPATHLEN-100);	/* TODO buffer overruns */
-			SysPrintf("Using config file %s.\n", cfgfile_basename);
-		}
-		else if (!strcmp(argv[i], "-cdfile")) {
-			char isofilename[MAXPATHLEN];
-
-			if (i+1 >= argc) break;
-			strncpy(isofilename, argv[++i], MAXPATHLEN);
-			if (isofilename[0] != '/') {
-				getcwd(path, MAXPATHLEN);
-				if (strlen(path) + strlen(isofilename) + 1 < MAXPATHLEN) {
-					strcat(path, "/");
-					strcat(path, isofilename);
-					strcpy(isofilename, path);
-				} else
-					isofilename[0] = 0;
-			}
-
-			cdfile = isofilename;
-		}
-		else if (!strcmp(argv[i], "-loadf")) {
-			if (i+1 >= argc) break;
-			loadst_f = argv[++i];
-		}
-		else if (!strcmp(argv[i], "-h") ||
-			 !strcmp(argv[i], "-help") ||
-			 !strcmp(argv[i], "--help")) {
-			 printf("PCSX-ReARMed " REV "\n");
-			 printf("%s\n", _(
-							" pcsx [options] [file]\n"
-							"\toptions:\n"
-							"\t-cdfile FILE\tRuns a CD image file\n"
-							"\t-cfg FILE\tLoads desired configuration file (default: ~/.pcsx/pcsx.cfg)\n"
-							"\t-psxout\t\tEnable PSX output\n"
-							"\t-load STATENUM\tLoads savestate STATENUM (1-5)\n"
-							"\t-h -help\tDisplay this message\n"
-							"\tfile\t\tLoads a PSX EXE file\n"));
-			 return 0;
-		} else {
-			strncpy(file, argv[i], MAXPATHLEN);
-			if (file[0] != '/') {
-				getcwd(path, MAXPATHLEN);
-				if (strlen(path) + strlen(file) + 1 < MAXPATHLEN) {
-					strcat(path, "/");
-					strcat(path, file);
-					strcpy(file, path);
-				} else
-					file[0] = 0;
-			}
-		}
-	}
-
-	if (cdfile)
-		set_cd_image(cdfile);
-
-	// frontend stuff
-	// init input but leave probing to platform code,
-	// they add input drivers and may need to modify them after probe
-	in_init();
-	pl_init();
-	plat_init();
-	menu_init(); // loads config
-
-	if (emu_core_init() != 0)
-		return 1;
-
-	if (psxout)
-		Config.PsxOut = 1;
-
-	if (LoadPlugins() == -1) {
-		// FIXME: this recovery doesn't work, just delete bad config and bail out
-		// SysMessage("could not load plugins, retrying with defaults\n");
-		set_default_paths();
-		snprintf(path, sizeof(path), "." PCSX_DOT_DIR "%s", cfgfile_basename);
-		remove(path);
-		SysMessage("Failed loading plugins!");
-		return 1;
-	}
-	pcnt_hook_plugins();
-
-	if (OpenPlugins() == -1) {
-		return 1;
-	}
-	plugin_call_rearmed_cbs();
-
-	CheckCdrom();
-	SysReset();
-
-	if (file[0] != '\0') {
-		if (Load(file) != -1)
-			ready_to_go = 1;
-	} else {
-		if (cdfile) {
-			if (LoadCdrom() == -1) {
-				ClosePlugins();
-				SysPrintf(_("Could not load CD-ROM!\n"));
-				return -1;
-			}
-			emu_on_new_cd(!loadst);
-			ready_to_go = 1;
-		}
-	}
-
-	if (loadst_f) {
-		int ret = LoadState(loadst_f);
-		SysPrintf("%s state file: %s\n",
-			ret ? "failed to load" : "loaded", loadst_f);
-		ready_to_go |= ret == 0;
-	}
-
-	if (ready_to_go) {
-		menu_prepare_emu();
-
-		// If a state has been specified, then load that
-		if (loadst) {
-			int ret = emu_load_state(loadst - 1);
-			SysPrintf("%s state %d\n",
-				ret ? "failed to load" : "loaded", loadst);
-		}
-	}
-	else
-		menu_loop();
-
-	pl_start_watchdog();
-
-	while (!g_emu_want_quit)
-	{
-		stop = 0;
-		emu_action = SACTION_NONE;
-
-		psxCpu->Execute();
-		if (emu_action != SACTION_NONE)
-			do_emu_action();
-	}
-
-	printf("Exit..\n");
-	ClosePlugins();
-	SysClose();
-	menu_finish();
-	plat_finish();
-
-	return 0;
-}
-
-static void toggle_fast_forward(int force_off)
-{
-	static int fast_forward;
-	static int normal_g_opts;
-	static int normal_frameskip;
-	static int normal_enhancement_enable;
-
-	if (force_off && !fast_forward)
-		return;
-
-	fast_forward = !fast_forward;
-	if (fast_forward) {
-		normal_g_opts = g_opts;
-		normal_frameskip = pl_rearmed_cbs.frameskip;
-		normal_enhancement_enable =
-			pl_rearmed_cbs.gpu_neon.enhancement_enable;
-
-		g_opts |= OPT_NO_FRAMELIM;
-		pl_rearmed_cbs.frameskip = 3;
-		pl_rearmed_cbs.gpu_neon.enhancement_enable = 0;
-	} else {
-		g_opts = normal_g_opts;
-		pl_rearmed_cbs.frameskip = normal_frameskip;
-		pl_rearmed_cbs.gpu_neon.enhancement_enable =
-			normal_enhancement_enable;
-
-		pl_timing_prepare(Config.PsxType);
-	}
-
-	if (!force_off)
-		snprintf(hud_msg, sizeof(hud_msg), "FAST FORWARD %s",
-			fast_forward ? "ON" : "OFF");
-}
-
-static void SignalExit(int sig) {
-	// only to restore framebuffer/resolution on some devices
-	plat_finish();
-	exit(1);
-}
-#endif
 
 void SysRunGui() {
         printf("SysRunGui\n");
@@ -843,11 +474,6 @@ void SysMessage(const char *fmt, ...) {
 static int _OpenPlugins(void) {
 	int ret;
 
-#ifndef NO_FRONTEND
-	signal(SIGINT, SignalExit);
-	signal(SIGPIPE, SignalExit);
-#endif
-
 	GPU_clearDynarec(clearDynarec);
 
 	ret = CDR_open();
@@ -936,14 +562,7 @@ int OpenPlugins() {
 }
 
 void ClosePlugins() {
-	int ret;
-
-#ifndef NO_FRONTEND
-	signal(SIGINT, SIG_DFL);
-	signal(SIGPIPE, SIG_DFL);
-#endif
-
-	ret = CDR_close();
+	int ret = CDR_close();
 	if (ret < 0) { SysMessage(_("Error closing CD-ROM plugin!")); return; }
 	ret = SPU_close();
 	if (ret < 0) { SysMessage(_("Error closing SPU plugin!")); return; }
