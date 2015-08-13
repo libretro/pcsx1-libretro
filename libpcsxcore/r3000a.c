@@ -33,9 +33,10 @@ int psxInit() {
 	SysPrintf(_("Running PCSX Version %s (%s).\n"), PACKAGE_VERSION, __DATE__);
 
 #ifdef PSXREC
-	if (Config.Cpu == CPU_INTERPRETER) {
+	if (Config.Cpu == CPU_INTERPRETER)
 		psxCpu = &psxInt;
-	} else psxCpu = &psxRec;
+	else
+      psxCpu = &psxRec;
 #else
 	psxCpu = &psxInt;
 #endif
@@ -210,16 +211,16 @@ void psxJumpTest() {
 		switch (psxRegs.pc & 0x1fffff) {
 			case 0xa0:
 #ifdef PSXBIOS_LOG
-				if (call != 0x28 && call != 0xe) {
-					PSXBIOS_LOG("Bios call a0: %s (%x) %x,%x,%x,%x\n", biosA0n[call], call, psxRegs.GPR.n.a0, psxRegs.GPR.n.a1, psxRegs.GPR.n.a2, psxRegs.GPR.n.a3); }
+				if (call != 0x28 && call != 0xe)
+					PSXBIOS_LOG("Bios call a0: %s (%x) %x,%x,%x,%x\n", biosA0n[call], call, psxRegs.GPR.n.a0, psxRegs.GPR.n.a1, psxRegs.GPR.n.a2, psxRegs.GPR.n.a3);
 #endif
 				if (biosA0[call])
 					biosA0[call]();
 				break;
 			case 0xb0:
 #ifdef PSXBIOS_LOG
-				if (call != 0x17 && call != 0xb) {
-					PSXBIOS_LOG("Bios call b0: %s (%x) %x,%x,%x,%x\n", biosB0n[call], call, psxRegs.GPR.n.a0, psxRegs.GPR.n.a1, psxRegs.GPR.n.a2, psxRegs.GPR.n.a3); }
+				if (call != 0x17 && call != 0xb)
+					PSXBIOS_LOG("Bios call b0: %s (%x) %x,%x,%x,%x\n", biosB0n[call], call, psxRegs.GPR.n.a0, psxRegs.GPR.n.a1, psxRegs.GPR.n.a2, psxRegs.GPR.n.a3);
 #endif
 				if (biosB0[call])
 					biosB0[call]();

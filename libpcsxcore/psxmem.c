@@ -336,16 +336,19 @@ void psxMemWrite16(u32 mem, u16 value) {
 	u32 t;
 
 	t = mem >> 16;
-	if (t == 0x1f80 || t == 0x9f80 || t == 0xbf80) {
-		if ((mem & 0xffff) < 0x400)
-			psxHu16ref(mem) = SWAPu16(value);
-		else
-			psxHwWrite16(mem, value);
-	}
+	if (t == 0x1f80 || t == 0x9f80 || t == 0xbf80)
+   {
+      if ((mem & 0xffff) < 0x400)
+         psxHu16ref(mem) = SWAPu16(value);
+      else
+         psxHwWrite16(mem, value);
+   }
    else
    {
 		p = (char *)(psxMemWLUT[t]);
-		if (p != NULL) {
+
+		if (p)
+      {
 #ifdef DEBUG
 			if (Config.Debug)
 				DebugCheckBP((mem & 0xffffff) | 0x80000000, W2);
@@ -355,12 +358,12 @@ void psxMemWrite16(u32 mem, u16 value) {
 			psxCpu->Clear((mem & (~3)), 1);
 #endif
 		}
+#ifdef PSXMEM_LOG
       else
       {
-#ifdef PSXMEM_LOG
 			PSXMEM_LOG("err sh %8.8lx\n", mem);
-#endif
 		}
+#endif
 	}
 }
 
