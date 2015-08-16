@@ -86,8 +86,7 @@ ifeq "$(HAVE_NEON)" "1"
 OBJS += plugins/gpu_neon/psx_gpu/psx_gpu_arm_neon.o
 CFLAGS += -DNEON_BUILD
 endif
-CFLAGS += -DNEON_PLUGIN
-plugins/gpu_neon/psx_gpu_if.o: CFLAGS += -DTEXTURE_CACHE_4BPP -DTEXTURE_CACHE_8BPP 
+CFLAGS += -DNEON_PLUGIN -DTEXTURE_CACHE_4BPP -DTEXTURE_CACHE_8BPP
 plugins/gpu_neon/psx_gpu_if.o: plugins/gpu_neon/psx_gpu/*.c
 endif
 ifeq "$(BUILTIN_GPU)" "peops"
