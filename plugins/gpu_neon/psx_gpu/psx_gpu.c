@@ -56,20 +56,15 @@ typedef s32 fixed_type;
 #define EDGE_STEP_BITS 32
 #define FIXED_BITS     12
 
-#define fixed_center(value)                                                    \
-  ((((fixed_type)(value)) << FIXED_BITS) + (1 << (FIXED_BITS - 1)))            \
+#define fixed_center(value)    ((((fixed_type)(value)) << FIXED_BITS) + (1 << (FIXED_BITS - 1)))
 
-#define int_to_fixed(value)                                                    \
-  (((fixed_type)(value)) << FIXED_BITS)                                        \
+#define int_to_fixed(value)    (((fixed_type)(value)) << FIXED_BITS)
 
-#define fixed_to_int(value)                                                    \
-  ((value) >> FIXED_BITS)                                                      \
+#define fixed_to_int(value)    ((value) >> FIXED_BITS)
 
-#define fixed_to_double(value)                                                 \
-  ((value) / (double)(1 << FIXED_BITS))                                        \
+#define fixed_to_double(value) ((value) / (double)(1 << FIXED_BITS))
 
-#define double_to_fixed(value)                                                 \
-  (fixed_type)(((value) * (double)(1 << FIXED_BITS)))                          \
+#define double_to_fixed(value) (fixed_type)(((value) * (double)(1 << FIXED_BITS)))
 
 
 typedef void (setup_blocks_function_type)(psx_gpu_struct *psx_gpu);
@@ -3356,17 +3351,12 @@ void render_sprite(psx_gpu_struct *psx_gpu, s32 x, s32 y, u32 u, u32 v,
 #define set_line_gradients(minor)                                              \
 {                                                                              \
   s32 gradient_divisor = delta_##minor;                                        \
+  gradient_r = gradient_g = gradient_b = 0;                                    \
   if(gradient_divisor != 0)                                                    \
   {                                                                            \
     gradient_r = int_to_fixed(vertex_b->r - vertex_a->r) / gradient_divisor;   \
     gradient_g = int_to_fixed(vertex_b->g - vertex_a->g) / gradient_divisor;   \
     gradient_b = int_to_fixed(vertex_b->b - vertex_a->b) / gradient_divisor;   \
-  }                                                                            \
-  else                                                                         \
-  {                                                                            \
-    gradient_r = 0;                                                            \
-    gradient_g = 0;                                                            \
-    gradient_b = 0;                                                            \
   }                                                                            \
   current_r = fixed_center(vertex_a->r);                                       \
   current_g = fixed_center(vertex_a->g);                                       \
