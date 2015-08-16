@@ -249,7 +249,7 @@ void retro_set_environment(retro_environment_t cb)
 #ifndef DRC_DISABLE
       { "pcsx_rearmed_drc", "Dynamic recompiler; enabled|disabled" },
 #endif
-#ifdef __ARM_NEON__
+#ifdef NEON_PLUGIN
       { "pcsx_rearmed_neon_interlace_enable", "Enable interlacing mode(s); disabled|enabled" },
       { "pcsx_rearmed_neon_enhancement_enable", "Enhanced resolution (slow); disabled|enabled" },
       { "pcsx_rearmed_neon_enhancement_no_main", "Enhanced resolution speed hack; disabled|enabled" },
@@ -992,7 +992,7 @@ static void update_variables(bool in_flight)
          in_type2 = PSE_PAD_TYPE_ANALOGPAD;
    }
 
-#ifdef __ARM_NEON__
+#ifdef NEON_PLUGIN
    var.value = "NULL";
    var.key = "pcsx_rearmed_neon_interlace_enable";
 
