@@ -176,45 +176,51 @@ build_vector_types(s);
 #define shl_long_4x16b(dest, source, shift)                                    \
   foreach_element(4, (dest).e[_i] = (source).e[_i] << (shift))                 \
 
+#define clamp16(n)                                                             \
+   n &= -(n >= 0);                                                             \
+   n = (n | ((0xff - n) >> 31)) & 0xff;                                        \
+
 #define shrq_narrow_signed_8x16b(dest, source, shift)                          \
   foreach_element(8,                                                           \
   {                                                                            \
     s32 result = ((s16)(source).e[_i]) >> shift;                               \
-    if(result < 0)                                                             \
-      result = 0;                                                              \
-    if(result > 0xFF)                                                          \
-      result = 0xFF;                                                           \
+    clamp16(result);                                                           \
     (dest).e[_i] = result;                                                     \
   })                                                                           \
+
+
 
 #define shl_reg_4x32b(dest, source_a, source_b)                                \
   foreach_element(4,                                                           \
   {                                                                            \
-    s8 shift  = (source_b).e[_i];                                              \
+    s8 shift   = (source_b).e[_i];                                             \
+    dest.e[_i] = (source_a).e[_i];                                             \
     if(shift < 0)                                                              \
-      dest.e[_i] = (source_a).e[_i] >> (-shift);                               \
+      dest.e[_i] >>= (-shift);                                                 \
     else                                                                       \
-      dest.e[_i] = (source_a).e[_i] << shift;                                  \
+      dest.e[_i] <<= shift;                                                    \
   })                                                                           \
 
 #define shl_reg_2x32b(dest, source_a, source_b)                                \
   foreach_element(2,                                                           \
   {                                                                            \
-    s8 shift  = (source_b).e[_i];                                              \
+    s8 shift   = (source_b).e[_i];                                             \
+    dest.e[_i] = (source_a).e[_i];                                             \
     if(shift < 0)                                                              \
-      dest.e[_i] = (source_a).e[_i] >> (-shift);                               \
+      dest.e[_i] >>= (-shift);                                                 \
     else                                                                       \
-      dest.e[_i] = (source_a).e[_i] << shift;                                  \
+      dest.e[_i] <<= shift;                                                    \
   })                                                                           \
 
 #define shl_reg_2x64b(dest, source_a, source_b)                                \
   foreach_element(2,                                                           \
   {                                                                            \
-    s8 shift  = (source_b).e[_i];                                              \
+    s8 shift   = (source_b).e[_i];                                             \
+    dest.e[_i] = (source_a).e[_i];                                             \
     if(shift < 0)                                                              \
-      dest.e[_i] = (source_a).e[_i] >> (-shift);                               \
+      dest.e[_i] >>= (-shift);                                                 \
     else                                                                       \
-      dest.e[_i] = (source_a).e[_i] << shift;                                  \
+      dest.e[_i] <<= shift;                                                    \
   })                                                                           \
 
 
@@ -425,10 +431,9 @@ build_vector_types(s);
   foreach_element(8,                                                           \
   {                                                                            \
     u32 index = indexes.e[_i];                                                 \
+    (dest).e[_i] = 0;                                                          \
     if(index < 16)                                                             \
       (dest).e[_i] = table.e[index];                                           \
-    else                                                                       \
-      (dest).e[_i] = 0;                                                        \
   })                                                                           \
 
 #define cmpeqz_8x16b(dest, source)                                             \
