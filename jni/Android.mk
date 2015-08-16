@@ -75,7 +75,7 @@ LOCAL_SRC_FILES += ../libpcsxcore/gte.c ../libpcsxcore/gte_nf.c ../libpcsxcore/g
 # spu
 LOCAL_SRC_FILES += ../plugins/dfsound/dma.c ../plugins/dfsound/freeze.c \
    ../plugins/dfsound/registers.c ../plugins/dfsound/spu.c \
-   ../plugins/dfsound/out.c ../plugins/dfsound/nullsnd.c
+   ../plugins/dfsound/out.c 
 
 # builtin gpu
 LOCAL_SRC_FILES += ../plugins/gpulib/gpu.c ../plugins/gpulib/vout_pl.c
