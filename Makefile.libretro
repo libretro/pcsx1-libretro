@@ -19,7 +19,7 @@ AS ?= as
 CC_AS ?= $(CC)
 CFLAGS ?=
 
-TARGET_NAME := pcsx_rearmed
+TARGET_NAME := pcsxr
 LIBM := -lm
 LIBZ := -lz
 LIBPTHREAD := -lpthread
