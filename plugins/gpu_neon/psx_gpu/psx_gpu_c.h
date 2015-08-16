@@ -1279,3 +1279,8 @@ void setup_sprite_16bpp_4x(psx_gpu_struct *psx_gpu, s32 x, s32 y, s32 u,
     }
   }
 }
+
+void scale2x_tiles8(void *dst, const void *src, int w8, int h)
+{
+   // TODO?
+}

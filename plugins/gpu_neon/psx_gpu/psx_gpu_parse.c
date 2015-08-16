@@ -866,11 +866,6 @@ static void update_enhancement_buf_table_from_x(psx_gpu_struct *psx_gpu,
 
 extern void scale2x_tiles8(void *dst, const void *src, int w8, int h);
 
-#ifndef NEON_BUILD
-// TODO?
-void scale2x_tiles8(void *dst, const void *src, int w8, int h) {}
-#endif
-
 static int disable_main_render;
 
 static void do_triangle_enhanced(psx_gpu_struct *psx_gpu,
