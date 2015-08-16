@@ -300,27 +300,6 @@ void flush_render_block_buffer(psx_gpu_struct *psx_gpu)
 void compute_all_gradients(psx_gpu_struct *psx_gpu, vertex_struct *a,
  vertex_struct *b, vertex_struct *c);
 
-#define vector_check(_a, _b)                                                   \
-  if(memcmp(&_a, &_b, sizeof(_b)))                                             \
-  {                                                                            \
-    if(sizeof(_b) == 8)                                                        \
-    {                                                                          \
-      printf("mismatch on %s vs %s: (%x %x) vs (%x %x)\n",                     \
-       #_a, #_b, _a.e[0], _a.e[1], _b.e[0], _b.e[1]);                          \
-    }                                                                          \
-    else                                                                       \
-    {                                                                          \
-      printf("mismatch on %s vs %s: (%x %x %x %x) vs (%x %x %x %x)\n",         \
-       #_a, #_b, _a.e[0], _a.e[1], _a.e[2], _a.e[3], _b.e[0], _b.e[1],         \
-       _b.e[2], _b.e[3]);                                                      \
-    }                                                                          \
-  }                                                                            \
-
-#define scalar_check(_a, _b)                                                   \
-  if(_a != _b)                                                                 \
-    printf("mismatch on %s %s: %x vs %x\n", #_a, #_b, _a, _b)                  \
-
-
 #ifndef NDEBUG
 #define setup_spans_debug_check(span_edge_data_element)                        \
 {                                                                              \
