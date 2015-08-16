@@ -213,7 +213,7 @@ ifeq ($(USE_DYNAREC),1)
 endif
 endif
 
-include Makefile
+include makefile_
 
 # no special AS needed for gpu_neon
 plugins/gpu_neon/psx_gpu/psx_gpu_arm_neon.o: plugins/gpu_neon/psx_gpu/psx_gpu_arm_neon.S
