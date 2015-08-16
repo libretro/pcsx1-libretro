@@ -33,6 +33,8 @@ ifeq ($(platform), unix)
 	fpic := -fPIC
 	SHARED := -shared -Wl,--version-script=libretro/link.T
 
+	BUILTIN_GPU = neon
+
 else ifeq ($(platform), linux-portable)
 	TARGET := $(TARGET_NAME)_libretro.so
 	fpic := -fPIC -nostdlib
