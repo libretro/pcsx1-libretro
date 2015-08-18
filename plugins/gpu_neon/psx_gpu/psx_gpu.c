@@ -3208,6 +3208,9 @@ void render_sprite(psx_gpu_struct *psx_gpu, s32 x, s32 y, u32 u, u32 v,
   color_b = (color >> 16) & 0xFF;                                              \
 }                                                                              \
 
+#define clamp8(n)                                                              \
+   (n) &= -((n) >= 0);                                                         \
+   (n) = ((n) | ((255 - (n)) >> 31));                                          \
 
 #define draw_pixel_line_dithered(_x, _y)                                       \
 {                                                                              \
@@ -3221,23 +3224,9 @@ void render_sprite(psx_gpu_struct *psx_gpu, s32 x, s32 y, u32 u, u32 v,
   color_g += dither_offset;                                                    \
   color_b += dither_offset;                                                    \
                                                                                \
-  if(color_r < 0)                                                              \
-    color_r = 0;                                                               \
-                                                                               \
-  if(color_g < 0)                                                              \
-    color_g = 0;                                                               \
-                                                                               \
-  if(color_b < 0)                                                              \
-    color_b = 0;                                                               \
-                                                                               \
-  if(color_r > 255)                                                            \
-    color_r = 255;                                                             \
-                                                                               \
-  if(color_g > 255)                                                            \
-    color_g = 255;                                                             \
-                                                                               \
-  if(color_b > 255)                                                            \
-    color_b = 255;                                                             \
+  clamp8(color_r);                                                             \
+  clamp8(color_g);                                                             \
+  clamp8(color_b);                                                             \
 }                                                                              \
 
 #define draw_pixel_line_undithered(_x, _y)                                     \
