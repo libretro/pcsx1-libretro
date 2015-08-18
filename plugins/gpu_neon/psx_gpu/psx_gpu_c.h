@@ -34,13 +34,10 @@ u32 fixed_reciprocal(u32 denominator, u32 *_shift)
 
 double reciprocal_estimate(double a)
 {
-  int q, s;
-  double r;
-
-  q = (int)(a * 512.0);
+  int q = (int)(a * 512.0);
   /* a in units of 1/512 rounded down */
-  r = 1.0 / (((double)q + 0.5) / 512.0); /* reciprocal r */
-  s = (int)(256.0 * r + 0.5);
+  double r = 1.0 / (((double)q + 0.5) / 512.0); /* reciprocal r */
+  int s = (int)(256.0 * r + 0.5);
 
   /* r in units of 1/256 rounded to nearest */
   

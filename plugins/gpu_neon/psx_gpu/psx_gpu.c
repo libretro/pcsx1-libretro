@@ -83,20 +83,14 @@ struct render_block_handler_struct
   blend_blocks_function_type *blend_blocks; 
 };
 
-s32 triangle_signed_area_x2(s32 x0, s32 y0, s32 x1, s32 y1, s32 x2, s32 y2)
-{
-	return ((x1 - x0) * (y2 - y1)) - ((x2 - x1) * (y1 - y0));
-}
+#define triangle_signed_area_x2(x0, y0, x1, y1, x2, y2) ((((x1) - (x0)) * ((y2) - (y1))) - (((x2) - (x1)) * (y1 - (y0))))
 
 u32 texture_region_mask(s32 x1, s32 y1, s32 x2, s32 y2)
 {
-  s32 coverage_x, coverage_y;
-
   u32 mask_up_left;
   u32 mask_down_right;
-
-  coverage_x = x2 >> 6;
-  coverage_y = y2 >> 8;
+  s32 coverage_x = x2 >> 6;
+  s32 coverage_y = y2 >> 8;
 
   if(coverage_x < 0)
     coverage_x = 0;
