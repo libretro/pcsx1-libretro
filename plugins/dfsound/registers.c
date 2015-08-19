@@ -414,9 +414,7 @@ static void NoiseOn(int start,int end,unsigned short val)
  int ch;
 
  for(ch=start;ch<end;ch++,val>>=1)                     // loop channels
-  {
    spu.s_chan[ch].bNoise=val&1;                        // -> noise on/off
-  }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -500,7 +498,5 @@ static void ReverbOn(int start,int end,unsigned short val)
  int ch;
 
  for(ch=start;ch<end;ch++,val>>=1)                     // loop channels
-  {
    spu.s_chan[ch].bReverb=val&1;                       // -> reverb on/off
-  }
 }

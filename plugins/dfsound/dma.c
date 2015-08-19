@@ -100,5 +100,3 @@ void CALLBACK SPUwriteDMAMem(unsigned short *pusPSXMem, int iSize,
    spu.spuAddr &= 0x7fffe;
   }
 }
-
-////////////////////////////////////////////////////////////////////////

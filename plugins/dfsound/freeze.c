@@ -314,8 +314,6 @@ long CALLBACK SPUfreeze(uint32_t ulFreezeMode, SPUFreeze_t * pF,
  return 1;
 }
 
-////////////////////////////////////////////////////////////////////////
-
 void LoadStateV5(SPUFreeze_t * pF)
 {
  int i;SPUOSSFreeze_t * pFO;
@@ -342,16 +340,12 @@ void LoadStateV5(SPUFreeze_t * pF)
   }
 }
 
-////////////////////////////////////////////////////////////////////////
-
 void LoadStateUnknown(SPUFreeze_t * pF, uint32_t cycles)
 {
  int i;
 
  for(i=0;i<MAXCHAN;i++)
-  {
    spu.s_chan[i].pLoop=spu.spuMemC;
-  }
 
  spu.dwNewChannel=0;
  spu.dwChannelOn=0;
@@ -359,9 +353,5 @@ void LoadStateUnknown(SPUFreeze_t * pF, uint32_t cycles)
  spu.pSpuIrq=spu.spuMemC;
 
  for(i=0;i<0xc0;i++)
-  {
    load_register(0x1f801c00 + i*2, cycles);
-  }
 }
-
-////////////////////////////////////////////////////////////////////////

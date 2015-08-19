@@ -243,18 +243,8 @@ static void do_vibration(unsigned char value)
     }
 }
 
-#if 0
-#include <stdio.h>
-unsigned char PADpoll_(unsigned char value);
-unsigned char PADpoll(unsigned char value) {
-	unsigned char b = CurByte, r = PADpoll_(value);
-	printf("poll[%d] %02x %02x\n", b, value, r);
-	return r;
-}
-#define PADpoll PADpoll_
-#endif
-
-unsigned char PADpoll_pad(unsigned char value) {
+unsigned char PADpoll_pad(unsigned char value)
+{
 	if (CurByte == 0) {
 		CurCmd = value;
 		CurByte++;

@@ -631,9 +631,7 @@ static void do_lsfr_samples(int ns_to, int ctrl,
 
 static int do_samples_noise(int ch, int ns_to)
 {
- int ret;
-
- ret = do_samples_skip(ch, ns_to);
+ int ret = do_samples_skip(ch, ns_to);
 
  do_lsfr_samples(ns_to, spu.spuCtrl, &spu.dwNoiseCount, &spu.dwNoiseVal);
 
@@ -1326,12 +1324,7 @@ static void RemoveStreams(void)
  spu.CDDAStart = NULL;
 }
 
-#if defined(C64X_DSP)
-
-/* special code for TI C64x DSP */
-#include "spu_c64x.c"
-
-#elif defined(THREAD_ENABLED)
+#if defined(THREAD_ENABLED)
 
 #include <pthread.h>
 #include <semaphore.h>
@@ -1533,22 +1526,12 @@ long CALLBACK SPUtest(void)
 // SPUCONFIGURE: call config dialog
 long CALLBACK SPUconfigure(void)
 {
-#ifdef _MACOSX
- DoConfiguration();
-#else
-// StartCfgTool("CFG");
-#endif
  return 0;
 }
 
 // SPUABOUT: show about window
 void CALLBACK SPUabout(void)
 {
-#ifdef _MACOSX
- DoAbout();
-#else
-// StartCfgTool("ABOUT");
-#endif
 }
 
 // SETUP CALLBACKS
@@ -1568,29 +1551,6 @@ void CALLBACK SPUregisterScheduleCb(void (CALLBACK *callback)(unsigned int))
 {
  spu.scheduleCallback = callback;
 }
-
-// COMMON PLUGIN INFO FUNCS
-/*
-char * CALLBACK PSEgetLibName(void)
-{
- return _(libraryName);
-}
-
-unsigned long CALLBACK PSEgetLibType(void)
-{
- return  PSE_LT_SPU;
-}
-
-unsigned long CALLBACK PSEgetLibVersion(void)
-{
- return (1 << 16) | (6 << 8);
-}
-
-char * SPUgetLibInfos(void)
-{
- return _(libraryInfo);
-}
-*/
 
 // debug
 void spu_get_debug_info(int *chans_out, int *run_chans, int *fmod_chans_out, int *noise_chans_out)
