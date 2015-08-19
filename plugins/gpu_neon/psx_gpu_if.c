@@ -9,7 +9,6 @@
  */
 
 #include <stdio.h>
-#include <sys/mman.h>
 
 extern const unsigned char cmd_lengths[256];
 #define command_lengths cmd_lengths
