@@ -1277,5 +1277,66 @@ static void setup_sprite_16bpp_4x(psx_gpu_struct *psx_gpu, s32 x, s32 y, s32 u,
 
 static void scale2x_tiles8(void *dst, const void *src, int w8, int h)
 {
-   // TODO?
+#if 0
+  /* push onto stack */
+  push { r4, r14 }
+
+  /* offset to r1 (src) */
+  mov r4, r1                  
+  /* fb_ptr = dst + (1024 * 2); */
+  add r12, r0, #1024*2
+  /* r14 = w8 */
+  mov r14, r2
+
+0:
+  /* vector load - r1 is src*/
+  vld1.u16 { q0 }, [r1, :128]!
+  vld1.u16 { q2 }, [r1, :128]!
+  /* move (immediate) */
+  vmov q1, q0 
+  vmov q3, q2 
+  /* vector interleave
+  vzip.16 q0, q1
+  vzip.16 q2, q3
+  /* subtract 2 from r14 (w8) and set condition flags */
+  subs r14, #2
+  /* vector store */
+  vst1.u16 { q0, q1 }, [r0, :128]!
+  vst1.u16 { q0, q1 }, [r12, :128]!
+  /* if negative true and V signed overflow false,
+     or negative false and V signed overflow true,
+     goto 1 */
+  blt 1f
+  /* vector store */
+  vst1.u16 { q2, q3 }, [r0, :128]!
+  vst1.u16 { q2, q3 }, [r12, :128]!
+  /* if condition is not 0, and negative and signed overflow set,
+  or if not 0, and negative and signed overflow are not set,
+  goto 0*/
+  bgt 0b
+1:
+  /* subtract 1 from r3 (h) and set condition flags */
+  subs r3, #1
+  /* set r14 to r2 (w8) */
+  mov r14, r2
+  /* r0 (dst) increment offset with 1024 * 2 * 2 */ 
+  add r0, #1024*2*2
+  /* r4 (src) increment offset with 1024 * 2 */
+  add r4, #1024*2
+  /* subtract r2 (w8) from r0 (dst), and do logical shift left 5 (<< 5)
+  sub r0, r0, r2, lsl #4+1
+  /* set r1 (src) to r4 (new offset for src) */
+  mov r1, r4
+  /* add to r12 (fb_ptr) r0 + (1024 * 2) */
+  add r12, r0, #1024*2
+  /* if r3 is not 0, and negative and signed overflow set,
+     or if r3 is not 0, and negative and signed overflow are not set,
+     goto 0 */
+  bgt 0b
+  
+  nop
+
+  /* pop from stack */
+  pop { r4, pc }
+#endif
 }
