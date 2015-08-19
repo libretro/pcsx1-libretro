@@ -63,7 +63,6 @@ int Load(const char *ExePath);
 
 int SaveState(const char *file);
 int LoadState(const char *file);
-int CheckState(const char *file);
 
 int SendPcsxInfo();
 int RecvPcsxInfo();

@@ -687,27 +687,6 @@ int LoadState(const char *file) {
 	return 0;
 }
 
-int CheckState(const char *file) {
-	void *f;
-	char header[32];
-	u32 version;
-	boolean hle;
-
-	f = SaveFuncs.open(file, "rb");
-	if (f == NULL) return -1;
-
-	SaveFuncs.read(f, header, sizeof(header));
-	SaveFuncs.read(f, &version, sizeof(u32));
-	SaveFuncs.read(f, &hle, sizeof(boolean));
-
-	SaveFuncs.close(f);
-
-	if (strncmp("STv4 PCSX", header, 9) != 0 || version != SaveVersion)
-		return -1;
-
-	return 0;
-}
-
 // NET Function Helpers
 
 int SendPcsxInfo() {
