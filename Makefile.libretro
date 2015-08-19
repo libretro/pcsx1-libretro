@@ -27,13 +27,13 @@ LIBDL := -ldl
 MMAP_WIN32=0
 EXTRA_LDFLAGS =
 
+BUILTIN_GPU = neon
+
 # Unix
 ifeq ($(platform), unix)
 	TARGET := $(TARGET_NAME)_libretro.so
 	fpic := -fPIC
 	SHARED := -shared -Wl,--version-script=libretro/link.T
-
-	BUILTIN_GPU = neon
 
 else ifeq ($(platform), linux-portable)
 	TARGET := $(TARGET_NAME)_libretro.so
@@ -75,7 +75,6 @@ endif
 	CFLAGS += -mcpu=cortex-a8 -mtune=cortex-a8 -mfpu=neon -marm
 	ASFLAGS += -mcpu=cortex-a8 -mtune=cortex-a8 -mfpu=neon
 	HAVE_NEON = 1
-	BUILTIN_GPU = neon
 	CFLAGS += -DIOS
 	OSXVER = `sw_vers -productVersion | cut -d. -f 2`
 	OSX_LT_MAVERICKS = `(( $(OSXVER) <= 9)) && echo "YES"`
@@ -143,7 +142,6 @@ else ifeq ($(platform), qnx)
 	HAVE_NEON = 1
 	USE_DYNAREC = 1
 	DRC_CACHE_BASE = 0
-	BUILTIN_GPU = neon
 	ARCH = arm
 	CFLAGS += -DBASE_ADDR_FIXED=0 -D__BLACKBERRY_QNX__ -marm -mcpu=cortex-a9 -mtune=cortex-a9 -mfpu=neon -mfloat-abi=softfp
 	ASFLAGS +=  -mcpu=cortex-a9 -mfpu=neon -mfloat-abi=softfp
@@ -165,7 +163,6 @@ else ifneq (,$(findstring armv,$(platform)))
 		CFLAGS += -mfpu=neon
 		ASFLAGS += -mfpu=neon
 		HAVE_NEON = 1
-		BUILTIN_GPU = neon
 	endif
 	ifneq (,$(findstring softfloat,$(platform)))
 		CFLAGS += -mfloat-abi=softfp
@@ -200,7 +197,6 @@ MAIN_LDLIBS += $(LIBM) $(LIBZ)
 
 TARGET ?= libretro.so
 PLATFORM = libretro
-BUILTIN_GPU ?= peops
 SOUND_DRIVERS = libretro
 PLUGINS =
 NO_CONFIG_MAK = yes
