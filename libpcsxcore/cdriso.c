@@ -24,13 +24,13 @@
 #include "cdrom.h"
 #include "cdriso.h"
 #include "ppf.h"
+#include "retro_miscellaneous.h"
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <process.h>
 #include <windows.h>
 #define strcasecmp _stricmp
-#define usleep(x) Sleep((x) / 1000)
 #else
 #include <pthread.h>
 #include <sys/time.h>
@@ -223,7 +223,7 @@ static void *playthread(void *param)
 			do {
 				ret = SPU_playCDDAchannel((short *)sndbuffer, s);
 				if (ret == 0x7761)
-					usleep(6 * 1000);
+					rarch_sleep(6);
 			} while (ret == 0x7761 && playing); // rearmed_wait
 		}
 
@@ -234,7 +234,7 @@ static void *playthread(void *param)
 			// HACK: stop feeding data while emu is paused
 			extern int stop;
 			while (stop && playing)
-				usleep(10000);
+				rarch_sleep(100);
 
 			now = GetTickCount();
 			osleep = t - now;
@@ -247,7 +247,7 @@ static void *playthread(void *param)
 				t = now;
 			}
 
-			usleep(osleep * 1000);
+			rarch_sleep(osleep);
 			t += CDDA_FRAMETIME;
 		}
 
