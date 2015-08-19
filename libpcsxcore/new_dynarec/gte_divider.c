@@ -2,7 +2,7 @@
 // based on pSXauthor's data
 // http://forums.ngemu.com/1844192-post72.html
 
-#include "psxcommon.h"
+#include "../psxcommon.h"
 
 static const u16 initial_guess[32768] = {
 	0x0000, 0xFE93, 0xFE91, 0xFE8F, 0xFE8D, 0xFE8B, 0xFE89, 0xFE87,

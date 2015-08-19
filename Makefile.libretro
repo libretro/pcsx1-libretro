@@ -28,6 +28,7 @@ MMAP_WIN32=0
 EXTRA_LDFLAGS =
 
 BUILTIN_GPU = neon
+NEW_GTE     = 1
 
 # Unix
 ifeq ($(platform), unix)
@@ -64,6 +65,7 @@ ifeq ($(USE_DYNAREC),0)
 endif
 	fpic := -fPIC
 	SHARED := -dynamiclib
+	NEW_GTE = 0
 
 	ifeq ($(IOSSDK),)
 		IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
@@ -145,6 +147,7 @@ else ifeq ($(platform), qnx)
 	ARCH = arm
 	CFLAGS += -DBASE_ADDR_FIXED=0 -D__BLACKBERRY_QNX__ -marm -mcpu=cortex-a9 -mtune=cortex-a9 -mfpu=neon -mfloat-abi=softfp
 	ASFLAGS +=  -mcpu=cortex-a9 -mfpu=neon -mfloat-abi=softfp
+	NEW_GTE = 0
 
 # ARM
 else ifneq (,$(findstring armv,$(platform)))
@@ -173,6 +176,7 @@ else ifneq (,$(findstring armv,$(platform)))
 	endif
 	ARCH = arm
 	USE_DYNAREC = 1
+	NEW_GTE = 0
 
 # Windows
 else

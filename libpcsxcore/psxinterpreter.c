@@ -23,7 +23,11 @@
 
 #include "psxcommon.h"
 #include "r3000a.h"
+#ifdef NEW_GTE
 #include "gte.h"
+#else
+#include "new_dynarec/gte.h"
+#endif
 #include "psxhle.h"
 #include "debug.h"
 

@@ -24,7 +24,11 @@
 #include "r3000a.h"
 #include "cdrom.h"
 #include "mdec.h"
+#ifdef NEW_GTE
 #include "gte.h"
+#else
+#include "new_dynarec/gte.h"
+#endif
 
 R3000Acpu *psxCpu = NULL;
 psxRegisters psxRegs;

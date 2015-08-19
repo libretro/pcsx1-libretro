@@ -36,13 +36,21 @@ OBJS += libpcsxcore/disr3000a.o \
 		  libpcsxcore/debug.o 
 endif
 
-OBJS += libpcsxcore/gte.o libpcsxcore/gte_nf.o libpcsxcore/gte_divider.o
+ifeq "$(NEW_GTE)" "1"
+OBJS += libpcsxcore/gte.o
+CFLAGS += -DNEW_GTE
+endif
+
+ifeq "$(NEW_GTE)" "0"
+OBJS += libpcsxcore/new_dynarec/gte.o libpcsxcore/new_dynarec/gte_nf.o libpcsxcore/new_dynarec/gte_divider.o
 ifeq "$(ARCH)" "arm"
-OBJS += libpcsxcore/gte_arm.o
+OBJS += libpcsxcore/new_dynarec/gte_arm.o
 endif
 ifeq "$(HAVE_NEON)" "1"
-OBJS += libpcsxcore/gte_neon.o
+OBJS += libpcsxcore/new_dynarec/gte_neon.o
 endif
+endif
+
 libpcsxcore/psxbios.o: CFLAGS += -Wno-nonnull
 
 # dynarec
@@ -118,7 +126,7 @@ OBJS += frontend/main.o frontend/plugin.o
 frontend/menu.o frontend/main.o: frontend/revision.h
 frontend/plat_sdl.o frontend/libretro.o: frontend/revision.h
 
-libpcsxcore/gte_nf.o: libpcsxcore/gte.c
+libpcsxcore/new_dynarec/gte_nf.o: libpcsxcore/new_dynarec/gte.c
 	$(CC) -c -o $@ $^ $(CFLAGS) -DFLAGLESS
 
 frontend/revision.h: FORCE

@@ -14,10 +14,15 @@
 #include "../cdrom.h"
 #include "../psxdma.h"
 #include "../mdec.h"
-#include "../gte_arm.h"
-#include "../gte_neon.h"
-#define FLAGLESS
+
+#ifdef NEW_GTE
 #include "../gte.h"
+#else
+#include "gte_arm.h"
+#include "gte_neon.h"
+#define FLAGLESS
+#include "gte.h"
+#endif
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
@@ -191,7 +196,9 @@ void new_dyna_freeze(void *f, int mode)
 	//printf("drc: %d block info entries %s\n", size/8, mode ? "saved" : "loaded");
 }
 
+#ifndef NEW_GTE
 /* GTE stuff */
+
 void *gte_handlers[64];
 
 void *gte_handlers_nf[64] = {
@@ -224,6 +231,8 @@ const char gte_cycletab[64] = {
 	30,  0,  0,  0,  0,  0,  0,  0,  5,  8, 17,  0,  0,  5,  6,  0,
 	23,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  5,  5, 39,
 };
+#endif
+
 
 #define GCBIT(x) \
 	(1ll << (32+x))
@@ -311,6 +320,7 @@ static int ari64_init()
 	new_dynarec_init();
 	new_dyna_pcsx_mem_init();
 
+#ifndef NEW_GTE
 	for (i = 0; i < ARRAY_SIZE(gte_handlers); i++)
 		if (psxCP2[i] != psxNULL)
 			gte_handlers[i] = psxCP2[i];
@@ -330,6 +340,7 @@ static int ari64_init()
 #endif
 #ifdef DRC_DBG
 	memcpy(gte_handlers_nf, gte_handlers, sizeof(gte_handlers_nf));
+#endif
 #endif
 	psxH_ptr = psxH;
 	zeromem_ptr = zero_mem;

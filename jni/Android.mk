@@ -21,7 +21,7 @@ ifeq ($(TARGET_ARCH),arm)
 
    LOCAL_CFLAGS += -DANDROID_ARM
 
-   LOCAL_SRC_FILES += ../libpcsxcore/gte_arm.S
+   LOCAL_SRC_FILES += ../libpcsxcore/new_dynarec/gte_arm.S
 
    # dynarec
    LOCAL_SRC_FILES += ../libpcsxcore/new_dynarec/new_dynarec.c ../libpcsxcore/new_dynarec/linkage_arm.S ../libpcsxcore/new_dynarec/emu_if.c ../libpcsxcore/new_dynarec/pcsxmem.c
@@ -39,11 +39,12 @@ ifeq ($(TARGET_ARCH),arm)
    else
       LOCAL_ARM_NEON := true
       LOCAL_CFLAGS += -DNEON_BUILD -DTEXTURE_CACHE_4BPP -DTEXTURE_CACHE_8BPP
-      LOCAL_SRC_FILES += ../libpcsxcore/gte_neon.S ../frontend/cspace_neon.S
+      LOCAL_SRC_FILES += ../libpcsxcore/new_dynarec/gte_neon.S ../frontend/cspace_neon.S
 
       # gpu
       LOCAL_SRC_FILES += ../plugins/gpu_neon/psx_gpu_if.c ../plugins/gpu_neon/psx_gpu/psx_gpu_arm_neon.S
    endif
+	LOCAL_SRC_FILES += ../libpcsxcore/new_dynarec/gte.c ../libpcsxcore/new_dynarec/gte_nf.c ../libpcsxcore/new_dynarec/gte_divider.c
 endif
 
 ifeq ($(TARGET_ARCH),x86)
@@ -70,7 +71,6 @@ LOCAL_SRC_FILES += ../libpcsxcore/cdriso.c ../libpcsxcore/cdrom.c ../libpcsxcore
    ../libpcsxcore/psxcommon.c ../libpcsxcore/psxcounters.c ../libpcsxcore/psxdma.c ../libpcsxcore/psxhle.c \
    ../libpcsxcore/psxhw.c ../libpcsxcore/psxinterpreter.c ../libpcsxcore/psxmem.c ../libpcsxcore/r3000a.c \
    ../libpcsxcore/sio.c ../libpcsxcore/socket.c ../libpcsxcore/spu.c
-LOCAL_SRC_FILES += ../libpcsxcore/gte.c ../libpcsxcore/gte_nf.c ../libpcsxcore/gte_divider.c
 
 # spu
 LOCAL_SRC_FILES += ../plugins/dfsound/dma.c ../plugins/dfsound/freeze.c \
