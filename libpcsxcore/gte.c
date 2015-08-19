@@ -169,7 +169,6 @@
 #define gteop (psxRegs.code & 0x1ffffff)
 
 #ifndef FLAGLESS
-
 static inline s32 BOUNDS_(psxCP2Regs *regs, s64 n_value, s64 n_max, int n_maxflag, s64 n_min, int n_minflag) {
 	if (n_value > n_max) {
 		gteFLAG |= n_maxflag;
@@ -178,6 +177,9 @@ static inline s32 BOUNDS_(psxCP2Regs *regs, s64 n_value, s64 n_max, int n_maxfla
 	}
 	return n_value;
 }
+#else
+#define BOUNDS_(regs, a, ...) (a)
+#endif
 
 static inline s32 LIM_(psxCP2Regs *regs, s32 value, s32 max, s32 min, u32 flag) {
 	s32 ret = value;
@@ -198,27 +200,6 @@ static inline u32 limE_(psxCP2Regs *regs, u32 result) {
 	}
 	return result;
 }
-
-#else
-
-#define BOUNDS_(regs, a, ...) (a)
-
-static inline s32 LIM_(psxCP2Regs *regs, s32 value, s32 max, s32 min, u32 flag_unused) {
-	s32 ret = value;
-	if (value > max)
-		ret = max;
-	else if (value < min)
-		ret = min;
-	return ret;
-}
-
-static inline u32 limE_(psxCP2Regs *regs, u32 result) {
-	if (result > 0x1ffff)
-		return 0x1ffff;
-	return result;
-}
-
-#endif
 
 #define BOUNDS(n_value,n_max,n_maxflag,n_min,n_minflag) \
 	BOUNDS_(regs,n_value,n_max,n_maxflag,n_min,n_minflag)
