@@ -39,8 +39,6 @@ void StopDebugger();
 
 int ready_to_go, g_emu_want_quit, g_emu_resetting;
 unsigned long gpuDisp;
-char cfgfile_basename[MAXPATHLEN];
-int state_slot;
 enum sched_action emu_action, emu_action_old;
 char hud_msg[64];
 int hud_new_msg;
@@ -264,10 +262,6 @@ void emu_on_new_cd(int show_hud_msg)
 
 int emu_core_preinit(void)
 {
-	// what is the name of the config file?
-	// it may be redefined by -cfg on the command line
-	strcpy(cfgfile_basename, "pcsx.cfg");
-
 #ifdef IOS
 	emuLog = fopen("/User/Documents/pcsxr.log", "w");
 	if (emuLog == NULL)
@@ -420,9 +414,6 @@ static int _OpenPlugins(void) {
 	if (ret < 0) { SysMessage(_("Error opening SPU plugin!")); return -1; }
 	SPU_registerCallback(SPUirq);
 	SPU_registerScheduleCb(SPUschedule);
-	// pcsx-rearmed: we handle gpu elsewhere
-	//ret = GPU_open(&gpuDisp, "PCSX", NULL);
-	//if (ret < 0) { SysMessage(_("Error opening GPU plugin!")); return -1; }
 	ret = PAD1_open(&gpuDisp);
 	if (ret < 0) { SysMessage(_("Error opening Controller 1 plugin!")); return -1; }
 	ret = PAD2_open(&gpuDisp);
