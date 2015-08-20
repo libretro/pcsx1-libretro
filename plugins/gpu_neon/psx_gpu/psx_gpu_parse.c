@@ -213,8 +213,8 @@ static void do_fill(psx_gpu_struct *psx_gpu, u32 x, u32 y,
 
 #if 1
 #define get_vertex_data_get_gte_vertex(vertex_number)                          \
-  vertexes[vertex_number].x = 0;                                               \
-  vertexes[vertex_number].y = 0;
+  vertexes[vertex_number].x = lx + psx_gpu->offset_x;                          \
+  vertexes[vertex_number].y = ly + psx_gpu->offset_y;
 #else                                  
 #define get_vertex_data_get_gte_vertex(vertex_number)                          \
   if (!getGteVertex(lx, ly, &vertexes[vertex_number].x,                        \
@@ -222,15 +222,15 @@ static void do_fill(psx_gpu_struct *psx_gpu, u32 x, u32 y,
   {                                                                            \
     vertexes[vertex_number].x = lx;                                            \
     vertexes[vertex_number].y = ly;                                            \
-  }                                                                         
+  }                                                                            \
+  vertexes[vertex_number].x += psx_gpu->offset_x;                              \
+  vertexes[vertex_number].y += psx_gpu->offset_y;
 #endif
 
 #define get_vertex_data_xy(vertex_number, offset16)                            \
   lx = sign_extend_12bit(list_s16[offset16]);                                  \
   ly = sign_extend_12bit(list_s16[(offset16) + 1]);                            \
-  get_vertex_data_get_gte_vertex(vertex_number);                               \
-  vertexes[vertex_number].x += lx + psx_gpu->offset_x;                         \
-  vertexes[vertex_number].y += ly + psx_gpu->offset_y;                         \
+  get_vertex_data_get_gte_vertex(vertex_number);                               
 
 #define get_vertex_data_uv(vertex_number, offset16)                            \
   vertexes[vertex_number].u = list_s16[offset16] & 0xFF;                       \
