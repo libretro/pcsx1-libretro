@@ -212,16 +212,16 @@ static void do_fill(psx_gpu_struct *psx_gpu, u32 x, u32 y,
   (((s32)((value) << 22)) >> 22)                                               \
 
 #if 1
-#define get_vertex_data_get_gte_vertex(vertex_number)                          \
-  vertexes[vertex_number].x = lx + psx_gpu->offset_x;                          \
-  vertexes[vertex_number].y = ly + psx_gpu->offset_y;
+#define get_vertex_data_get_gte_vertex(lx, ly, vertex_number)                  \
+  vertexes[vertex_number].x = (lx) + psx_gpu->offset_x;                        \
+  vertexes[vertex_number].y = (ly) + psx_gpu->offset_y;
 #else                                  
-#define get_vertex_data_get_gte_vertex(vertex_number)                          \
-  if (!getGteVertex(lx, ly, &vertexes[vertex_number].x,                        \
+#define get_vertex_data_get_gte_vertex(lx, ly, vertex_number)                  \
+  if (!getGteVertex((lx), (ly), &vertexes[vertex_number].x,                    \
         &vertexes[vertex_number].y))                                           \
   {                                                                            \
-    vertexes[vertex_number].x = lx;                                            \
-    vertexes[vertex_number].y = ly;                                            \
+    vertexes[vertex_number].x = (lx);                                          \
+    vertexes[vertex_number].y = (ly);                                          \
   }                                                                            \
   vertexes[vertex_number].x += psx_gpu->offset_x;                              \
   vertexes[vertex_number].y += psx_gpu->offset_y;
@@ -230,7 +230,7 @@ static void do_fill(psx_gpu_struct *psx_gpu, u32 x, u32 y,
 #define get_vertex_data_xy(vertex_number, offset16)                            \
   lx = sign_extend_12bit(list_s16[offset16]);                                  \
   ly = sign_extend_12bit(list_s16[(offset16) + 1]);                            \
-  get_vertex_data_get_gte_vertex(vertex_number);                               
+  get_vertex_data_get_gte_vertex(lx, ly, vertex_number);                               
 
 #define get_vertex_data_uv(vertex_number, offset16)                            \
   vertexes[vertex_number].u = list_s16[offset16] & 0xFF;                       \
@@ -420,10 +420,8 @@ u32 gpu_parse(psx_gpu_struct *psx_gpu, u32 *list, u32 size, u32 *last_command)
   
   		case 0x40 ... 0x47:
       {
-        vertexes[0].x = list_s16[2] + psx_gpu->offset_x;
-        vertexes[0].y = list_s16[3] + psx_gpu->offset_y;
-        vertexes[1].x = list_s16[4] + psx_gpu->offset_x;
-        vertexes[1].y = list_s16[5] + psx_gpu->offset_y;
+        get_vertex_data_get_gte_vertex(list_s16[2], list_s16[3], 0);
+        get_vertex_data_get_gte_vertex(list_s16[4], list_s16[5], 1);
 
         render_line(psx_gpu, vertexes, current_command, list[0], 0);
   			break;
@@ -435,8 +433,7 @@ u32 gpu_parse(psx_gpu_struct *psx_gpu, u32 *list, u32 size, u32 *last_command)
         u32 *list_position = &(list[2]);
         u32 xy = list[1];
 
-        vertexes[1].x = (xy & 0xFFFF) + psx_gpu->offset_x;
-        vertexes[1].y = (xy >> 16) + psx_gpu->offset_y;
+        get_vertex_data_get_gte_vertex((xy & 0xFFFF), (xy >> 16), 1);
       
         xy = *list_position;
         while(1)
@@ -471,14 +468,12 @@ u32 gpu_parse(psx_gpu_struct *psx_gpu, u32 *list, u32 size, u32 *last_command)
         vertexes[0].r = list[0] & 0xFF;
         vertexes[0].g = (list[0] >> 8) & 0xFF;
         vertexes[0].b = (list[0] >> 16) & 0xFF;
-        vertexes[0].x = list_s16[2] + psx_gpu->offset_x;
-        vertexes[0].y = list_s16[3] + psx_gpu->offset_y;
+        get_vertex_data_get_gte_vertex(list_s16[2], list_s16[3], 0);
 
         vertexes[1].r = list[2] & 0xFF;
         vertexes[1].g = (list[2] >> 8) & 0xFF;
         vertexes[1].b = (list[2] >> 16) & 0xFF;
-        vertexes[1].x = list_s16[6] + psx_gpu->offset_x;
-        vertexes[1].y = list_s16[7] + psx_gpu->offset_y;
+        get_vertex_data_get_gte_vertex(list_s16[6], list_s16[7], 1);
 
         render_line(psx_gpu, vertexes, current_command, 0, 0);
   			break;
@@ -494,8 +489,7 @@ u32 gpu_parse(psx_gpu_struct *psx_gpu, u32 *list, u32 size, u32 *last_command)
         vertexes[1].r = color & 0xFF;
         vertexes[1].g = (color >> 8) & 0xFF;
         vertexes[1].b = (color >> 16) & 0xFF;
-        vertexes[1].x = (xy & 0xFFFF) + psx_gpu->offset_x;
-        vertexes[1].y = (xy >> 16) + psx_gpu->offset_y;
+        get_vertex_data_get_gte_vertex((xy & 0xFFFF), (xy >> 16), 1);
       
         color = list_position[0];
         while(1)
@@ -507,8 +501,7 @@ u32 gpu_parse(psx_gpu_struct *psx_gpu, u32 *list, u32 size, u32 *last_command)
           vertexes[1].r = color & 0xFF;
           vertexes[1].g = (color >> 8) & 0xFF;
           vertexes[1].b = (color >> 16) & 0xFF;
-          vertexes[1].x = (xy & 0xFFFF) + psx_gpu->offset_x;
-          vertexes[1].y = (xy >> 16) + psx_gpu->offset_y;
+          get_vertex_data_get_gte_vertex((xy & 0xFFFF), (xy >> 16), 1);
 
           render_line(psx_gpu, vertexes, current_command, 0, 0);
 
@@ -1172,10 +1165,8 @@ u32 gpu_parse_enhanced(psx_gpu_struct *psx_gpu, u32 *list, u32 size,
   
       case 0x40 ... 0x47:
       {
-        vertexes[0].x = list_s16[2] + psx_gpu->offset_x;
-        vertexes[0].y = list_s16[3] + psx_gpu->offset_y;
-        vertexes[1].x = list_s16[4] + psx_gpu->offset_x;
-        vertexes[1].y = list_s16[5] + psx_gpu->offset_y;
+        get_vertex_data_get_gte_vertex(list_s16[2], list_s16[3], 0);
+        get_vertex_data_get_gte_vertex(list_s16[4], list_s16[5], 1);
 
         render_line(psx_gpu, vertexes, current_command, list[0], 0);
         enhancement_enable();
@@ -1189,16 +1180,14 @@ u32 gpu_parse_enhanced(psx_gpu_struct *psx_gpu, u32 *list, u32 size,
         u32 *list_position = &(list[2]);
         u32 xy = list[1];
 
-        vertexes[1].x = (xy & 0xFFFF) + psx_gpu->offset_x;
-        vertexes[1].y = (xy >> 16) + psx_gpu->offset_y;
+        get_vertex_data_get_gte_vertex((xy & 0xFFFF), (xy >> 16), 1);
       
         xy = *list_position;
         while(1)
         {
           vertexes[0] = vertexes[1];
 
-          vertexes[1].x = (xy & 0xFFFF) + psx_gpu->offset_x;
-          vertexes[1].y = (xy >> 16) + psx_gpu->offset_y;
+          get_vertex_data_get_gte_vertex((xy & 0xFFFF), (xy >> 16), 1);
 
           enhancement_disable();
           render_line(psx_gpu, vertexes, current_command, list[0], 0);
@@ -1228,14 +1217,12 @@ u32 gpu_parse_enhanced(psx_gpu_struct *psx_gpu, u32 *list, u32 size,
         vertexes[0].r = list[0] & 0xFF;
         vertexes[0].g = (list[0] >> 8) & 0xFF;
         vertexes[0].b = (list[0] >> 16) & 0xFF;
-        vertexes[0].x = list_s16[2] + psx_gpu->offset_x;
-        vertexes[0].y = list_s16[3] + psx_gpu->offset_y;
+        get_vertex_data_get_gte_vertex(list_s16[2], list_s16[3], 0);
 
         vertexes[1].r = list[2] & 0xFF;
         vertexes[1].g = (list[2] >> 8) & 0xFF;
         vertexes[1].b = (list[2] >> 16) & 0xFF;
-        vertexes[1].x = list_s16[6] + psx_gpu->offset_x;
-        vertexes[1].y = list_s16[7] + psx_gpu->offset_y;
+        get_vertex_data_get_gte_vertex(list_s16[6], list_s16[7], 1);
 
         render_line(psx_gpu, vertexes, current_command, 0, 0);
         enhancement_enable();
@@ -1253,8 +1240,7 @@ u32 gpu_parse_enhanced(psx_gpu_struct *psx_gpu, u32 *list, u32 size,
         vertexes[1].r = color & 0xFF;
         vertexes[1].g = (color >> 8) & 0xFF;
         vertexes[1].b = (color >> 16) & 0xFF;
-        vertexes[1].x = (xy & 0xFFFF) + psx_gpu->offset_x;
-        vertexes[1].y = (xy >> 16) + psx_gpu->offset_y;
+        get_vertex_data_get_gte_vertex((xy & 0xFFFF), (xy >> 16), 1);
       
         color = list_position[0];
         while(1)
@@ -1266,8 +1252,7 @@ u32 gpu_parse_enhanced(psx_gpu_struct *psx_gpu, u32 *list, u32 size,
           vertexes[1].r = color & 0xFF;
           vertexes[1].g = (color >> 8) & 0xFF;
           vertexes[1].b = (color >> 16) & 0xFF;
-          vertexes[1].x = (xy & 0xFFFF) + psx_gpu->offset_x;
-          vertexes[1].y = (xy >> 16) + psx_gpu->offset_y;
+          get_vertex_data_get_gte_vertex((xy & 0xFFFF), (xy >> 16), 1);
 
           enhancement_disable();
           render_line(psx_gpu, vertexes, current_command, 0, 0);
