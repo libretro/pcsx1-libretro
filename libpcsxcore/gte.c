@@ -490,12 +490,10 @@ int docop2(int op) {
 		SX2 = Lm_G1(F((s64) OFX + ((s64) IR1 * h_over_sz3) * (Config.Widescreen ? 0.75 : 1)) >> 16);
 		SY2 = Lm_G2(F((s64) OFY + ((s64) IR2 * h_over_sz3)) >> 16);
 		
-#ifdef GTE_ACCURACY
 		GPU_addVertex(SX2, SY2,
                   Lm_G1_ia((s64) OFX + (s64)(IR1 * h_over_sz3) * (Config.Widescreen ? 0.75 : 1)),
                   Lm_G2_ia((s64) OFY + (s64)(IR2 * h_over_sz3)),
 				  ((s64)SZ3));
-#endif
 		
 		MAC0 = F((s64) DQB + ((s64) DQA * h_over_sz3));
 		IR0 = Lm_H(m_mac0, 1);
@@ -881,12 +879,10 @@ int docop2(int op) {
 			SX2 = Lm_G1(F((s64) OFX + ((s64) IR1 * h_over_sz3) * (Config.Widescreen ? 0.75 : 1)) >> 16);
 			SY2 = Lm_G2(F((s64) OFY + ((s64) IR2 * h_over_sz3)) >> 16);
 			
-#ifdef GTE_ACCURACY
 			GPU_addVertex(SX2, SY2,
                   Lm_G1_ia((s64) OFX + (s64)(IR1 * h_over_sz3) * (Config.Widescreen ? 0.75 : 1)),
                   Lm_G2_ia((s64) OFY + (s64)(IR2 * h_over_sz3)),
 				  ((s64)SZ3));
-#endif
 		}
 
 		MAC0 = F((s64) DQB + ((s64) DQA * h_over_sz3));

@@ -79,6 +79,9 @@ typedef void (CALLBACK* GPUabout)(void);
 typedef void (CALLBACK* GPUmakeSnapshot)(void);
 typedef void (CALLBACK* GPUkeypressed)(int);
 typedef void (CALLBACK* GPUdisplayText)(char *);
+
+void GPU_addVertex(short,short,s64,s64,s64);
+
 typedef struct {
 	uint32_t ulFreezeVersion;
 	uint32_t ulStatus;

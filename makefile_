@@ -87,8 +87,10 @@ plugins/dfsound/out.o: CFLAGS += -DHAVE_LIBRETRO
 endif
 
 # builtin gpu
-OBJS += plugins/gpu_neon/vout_pl.o
-OBJS += plugins/gpu_neon/psx_gpu_if.o
+OBJS += plugins/gpu_neon/vout_pl.o \
+		  plugins/gpu_neon/psx_gpu_if.o \
+		  plugins/gpu_neon/psx_gpu/gte_accuracy.o
+
 ifeq "$(HAVE_NEON)" "1"
 OBJS += plugins/gpu_neon/psx_gpu/psx_gpu_arm_neon.o
 CFLAGS += -DNEON_BUILD
