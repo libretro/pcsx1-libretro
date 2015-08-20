@@ -236,10 +236,12 @@ static void do_fill(psx_gpu_struct *psx_gpu, u32 x, u32 y,
   vertexes[vertex_number].u = list_s16[offset16] & 0xFF;                       \
   vertexes[vertex_number].v = (list_s16[offset16] >> 8) & 0xFF                 \
 
-#define get_vertex_data_rgb(vertex_number, offset32)                           \
-  vertexes[vertex_number].r = list[offset32] & 0xFF;                           \
-  vertexes[vertex_number].g = (list[offset32] >> 8) & 0xFF;                    \
-  vertexes[vertex_number].b = (list[offset32] >> 16) & 0xFF                    \
+#define set_vertex_color_constant(vertex_number, color)                        \
+  vertexes[vertex_number].r = color & 0xFF;                                    \
+  vertexes[vertex_number].g = (color >> 8) & 0xFF;                             \
+  vertexes[vertex_number].b = (color >> 16) & 0xFF                             \
+
+#define get_vertex_data_rgb(vertex_number, offset32) set_vertex_color_constant(vertex_number, list[offset32]);
 
 #define get_vertex_data_xy_uv(vertex_number, offset16)                         \
   get_vertex_data_xy(vertex_number, offset16);                                 \
@@ -254,10 +256,6 @@ static void do_fill(psx_gpu_struct *psx_gpu, u32 x, u32 y,
   get_vertex_data_xy(vertex_number, (offset16) + 2);                           \
   get_vertex_data_uv(vertex_number, (offset16) + 4);                           \
 
-#define set_vertex_color_constant(vertex_number, color)                        \
-  vertexes[vertex_number].r = color & 0xFF;                                    \
-  vertexes[vertex_number].g = (color >> 8) & 0xFF;                             \
-  vertexes[vertex_number].b = (color >> 16) & 0xFF                             \
 
 #define get_vertex_data_xy_rgb_constant(vertex_number, offset16, color)        \
   get_vertex_data_xy(vertex_number, offset16);                                 \
@@ -465,14 +463,10 @@ u32 gpu_parse(psx_gpu_struct *psx_gpu, u32 *list, u32 size, u32 *last_command)
   
   		case 0x50 ... 0x57:
       {
-        vertexes[0].r = list[0] & 0xFF;
-        vertexes[0].g = (list[0] >> 8) & 0xFF;
-        vertexes[0].b = (list[0] >> 16) & 0xFF;
+        set_vertex_color_constant(0, list[0]);
         get_vertex_data_get_gte_vertex(list_s16[2], list_s16[3], 0);
 
-        vertexes[1].r = list[2] & 0xFF;
-        vertexes[1].g = (list[2] >> 8) & 0xFF;
-        vertexes[1].b = (list[2] >> 16) & 0xFF;
+        set_vertex_color_constant(1, list[2]);
         get_vertex_data_get_gte_vertex(list_s16[6], list_s16[7], 1);
 
         render_line(psx_gpu, vertexes, current_command, 0, 0);
@@ -486,9 +480,7 @@ u32 gpu_parse(psx_gpu_struct *psx_gpu, u32 *list, u32 size, u32 *last_command)
         u32 color = list[0];
         u32 xy = list[1];
 
-        vertexes[1].r = color & 0xFF;
-        vertexes[1].g = (color >> 8) & 0xFF;
-        vertexes[1].b = (color >> 16) & 0xFF;
+        set_vertex_color_constant(1, color);
         get_vertex_data_get_gte_vertex((xy & 0xFFFF), (xy >> 16), 1);
       
         color = list_position[0];
@@ -498,9 +490,7 @@ u32 gpu_parse(psx_gpu_struct *psx_gpu, u32 *list, u32 size, u32 *last_command)
 
           vertexes[0] = vertexes[1];
 
-          vertexes[1].r = color & 0xFF;
-          vertexes[1].g = (color >> 8) & 0xFF;
-          vertexes[1].b = (color >> 16) & 0xFF;
+          set_vertex_color_constant(1, color);
           get_vertex_data_get_gte_vertex((xy & 0xFFFF), (xy >> 16), 1);
 
           render_line(psx_gpu, vertexes, current_command, 0, 0);
@@ -1214,14 +1204,10 @@ u32 gpu_parse_enhanced(psx_gpu_struct *psx_gpu, u32 *list, u32 size,
   
       case 0x50 ... 0x57:
       {
-        vertexes[0].r = list[0] & 0xFF;
-        vertexes[0].g = (list[0] >> 8) & 0xFF;
-        vertexes[0].b = (list[0] >> 16) & 0xFF;
+        set_vertex_color_constant(0, list[0]);
         get_vertex_data_get_gte_vertex(list_s16[2], list_s16[3], 0);
 
-        vertexes[1].r = list[2] & 0xFF;
-        vertexes[1].g = (list[2] >> 8) & 0xFF;
-        vertexes[1].b = (list[2] >> 16) & 0xFF;
+        set_vertex_color_constant(1, list[2]);
         get_vertex_data_get_gte_vertex(list_s16[6], list_s16[7], 1);
 
         render_line(psx_gpu, vertexes, current_command, 0, 0);
@@ -1237,9 +1223,7 @@ u32 gpu_parse_enhanced(psx_gpu_struct *psx_gpu, u32 *list, u32 size,
         u32 color = list[0];
         u32 xy = list[1];
 
-        vertexes[1].r = color & 0xFF;
-        vertexes[1].g = (color >> 8) & 0xFF;
-        vertexes[1].b = (color >> 16) & 0xFF;
+        set_vertex_color_constant(1, color);
         get_vertex_data_get_gte_vertex((xy & 0xFFFF), (xy >> 16), 1);
       
         color = list_position[0];
@@ -1249,9 +1233,7 @@ u32 gpu_parse_enhanced(psx_gpu_struct *psx_gpu, u32 *list, u32 size,
 
           vertexes[0] = vertexes[1];
 
-          vertexes[1].r = color & 0xFF;
-          vertexes[1].g = (color >> 8) & 0xFF;
-          vertexes[1].b = (color >> 16) & 0xFF;
+          set_vertex_color_constant(1, color);
           get_vertex_data_get_gte_vertex((xy & 0xFFFF), (xy >> 16), 1);
 
           enhancement_disable();
