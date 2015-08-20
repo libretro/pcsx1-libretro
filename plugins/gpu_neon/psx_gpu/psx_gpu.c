@@ -2941,7 +2941,7 @@ static void setup_sprite_16bpp_4x(psx_gpu_struct *psx_gpu, s32 x, s32 y, s32 u, 
 
 static void setup_sprite_untextured(psx_gpu_struct *psx_gpu, s32 x, s32 y, s32 u,
  s32 v, s32 width, s32 height, u32 color);
-static void setup_sprite_untextured_simple(psx_gpu_struct *psx_gpu, s32 x, s32 y,
+void setup_sprite_untextured_simple(psx_gpu_struct *psx_gpu, s32 x, s32 y,
  s32 u, s32 v, s32 width, s32 height, u32 color);
 
 void setup_sprite_untextured_simple(psx_gpu_struct *psx_gpu, s32 x, s32 y,
