@@ -21,7 +21,7 @@
 #include <stddef.h>
 #include <string.h>
 
-int bGteAccuracy;
+int bGteAccuracy = 0;
 
 typedef float (*gteCoords_t)[0x800 * 2][2];
 gteCoords_t gteCoords = NULL;
