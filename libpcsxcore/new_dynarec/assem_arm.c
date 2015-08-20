@@ -20,12 +20,12 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 #ifdef PCSX
-#include "../gte.h"
+#include "gte.h"
 #define FLAGLESS
-#include "../gte.h"
+#include "gte.h"
 #undef FLAGLESS
-#include "../gte_arm.h"
-#include "../gte_neon.h"
+#include "gte_arm.h"
+#include "gte_neon.h"
 #include "pcnt.h"
 #endif
 #include "arm_features.h"

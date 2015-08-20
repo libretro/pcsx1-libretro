@@ -62,8 +62,8 @@
 extern "C" {
 #endif
 
-#include "psxcommon.h"
-#include "r3000a.h"
+#include "../psxcommon.h"
+#include "../r3000a.h"
 
 struct psxCP2Regs;
 
