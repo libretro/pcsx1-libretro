@@ -430,9 +430,8 @@ void *get_addr(u_int vaddr)
         }
         else restore_candidate[page>>3]|=1<<(page&7);
         int *ht_bin=hash_table[((vaddr>>16)^vaddr)&0xFFFF];
-        if(ht_bin[0]==vaddr) {
+        if(ht_bin[0]==vaddr)
           ht_bin[1]=(int)head->addr; // Replace existing entry
-        }
         else
         {
           ht_bin[3]=ht_bin[1];
@@ -457,7 +456,8 @@ void *get_addr(u_int vaddr)
   EntryHi=BadVAddr&0xFFFFE000;
   return get_addr_ht(0x80000000);
 }
-// Look up address in hash table first
+
+/* Look up address in hash table first */
 void *get_addr_ht(u_int vaddr)
 {
   //printf("TRACE: count=%d next=%d (get_addr_ht %x)\n",Count,next_interupt,vaddr);
