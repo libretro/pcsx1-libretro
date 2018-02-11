@@ -23,7 +23,11 @@ TARGET_NAME := pcsx1
 LIBM := -lm
 LIBZ := -lz
 LIBPTHREAD := -lpthread
+ifneq (,$(findstring Haiku,$(shell uname -s)))
+LIBDL := -ldlib
+else
 LIBDL := -ldl
+endif
 MMAP_WIN32=0
 EXTRA_LDFLAGS =
 
